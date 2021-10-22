@@ -164,7 +164,6 @@ void high_priority_handler(void) {
     
     if (PIR1bits.RCIF == 1) {
         rx = RCREG;
-        PIR1bits.RCIF = 0;
     }
     else if (INTCON3bits.INT1IF == 1) {
         INTCON3bits.INT1IF = 0;
@@ -175,61 +174,62 @@ void high_priority_handler(void) {
     else if (INTCON3bits.INT2IF == 1) {
         INTCON3bits.INT2IF = 0;
         freq_now = FREQ_SEL[frqs_i++];
+        rx = frqs_i + (unsigned int)'0';
         if (frqs_i >= freq_sel_max) frqs_i = 0;
     }  
     switch(rx) {
         case 'A':
             ptr_current_wav = &WAVEFORM_triangle[0];
-            wavs_i = TRIANGLE;
+            // wavs_i = TRIANGLE;
             WAVEFORM_max_points = WAVEFORM_MAX_PTS[TRIANGLE];
             break;
         case 'B':
             ptr_current_wav = &WAVEFORM_rampup[0];
-            wavs_i = RAMP_UP;
+            // wavs_i = RAMP_UP;
             WAVEFORM_max_points = WAVEFORM_MAX_PTS[RAMP_UP];
             break;
         case 'C':
-            wavs_i = RAMP_DOWN;
+            // wavs_i = RAMP_DOWN;
             ptr_current_wav = &WAVEFORM_rampdown[0];
             WAVEFORM_max_points = WAVEFORM_MAX_PTS[RAMP_DOWN];
             break;
         case 'D':
-            wavs_i = SQUARE;
+            // wavs_i = SQUARE;
             ptr_current_wav = &WAVEFORM_square[0];
             WAVEFORM_max_points = WAVEFORM_MAX_PTS[SQUARE];
             break;
         case 'E':
-            wavs_i = SINE;
+            // wavs_i = SINE;
             ptr_current_wav = &WAVEFORM_sine[0];
             WAVEFORM_max_points = WAVEFORM_MAX_PTS[SINE];
             break;
         case 'F':
-            wavs_i = PULSE;
+            // wavs_i = PULSE;
             ptr_current_wav = &WAVEFORM_pulse[0];
             WAVEFORM_max_points = WAVEFORM_MAX_PTS[PULSE];
             break;
         case '1':
             freq_now = FREQ_SEL[HZ_2];
-            frqs_i = HZ_2;
+            // frqs_i = HZ_2;
             break;
         case '2':
-            frqs_i = HZ_5;
+            // frqs_i = HZ_5;
             freq_now = FREQ_SEL[HZ_5];
             break;
         case '3':
-            frqs_i = HZ_10;
+            // frqs_i = HZ_10;
             freq_now = FREQ_SEL[HZ_10];
             break;
         case '4':
-            frqs_i = HZ_20;
+            // frqs_i = HZ_20;
             freq_now = FREQ_SEL[HZ_20];
             break;
         case '5':
-            frqs_i = HZ_50;
+            // frqs_i = HZ_50;
             freq_now = FREQ_SEL[HZ_50];
             break;
         case '6':
-            frqs_i = HZ_100;
+            // frqs_i = HZ_100;
             freq_now = FREQ_SEL[HZ_100];
             break;
         default:
@@ -362,6 +362,8 @@ void general_setup(void) {
      */
     OpenRB1INT(PORTB_CHANGE_INT_ON & FALLING_EDGE_INT & PORTB_PULLUPS_OFF);
     OpenRB2INT(PORTB_CHANGE_INT_ON & FALLING_EDGE_INT & PORTB_PULLUPS_OFF);
+    INTCON3bits.INT1IP = 1;             // Use as high priority interrupt
+    INTCON3bits.INT2IP = 1;
     INTCON3bits.INT2IF = 0;             // Clear interrupt flag
     INTCON3bits.INT1IF = 0;
 
